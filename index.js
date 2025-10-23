@@ -2,6 +2,7 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const sqlite3 = require('sqlite3').verbose();
+const cors = require('cors');
 
 //Documentación en https://expressjs.com/en/starter/hello-world.html
 const app = express()
@@ -10,6 +11,7 @@ const app = express()
 //Documentación en https://expressjs.com/en/resources/middleware/body-parser.html
 const jsonParser = bodyParser.json()
 
+app.use(cors());
 
 // Abre la base de datos de SQLite
 let db = new sqlite3.Database('./base.sqlite3', (err) => {
@@ -64,6 +66,25 @@ app.post('/insert', jsonParser, function (req, res) {
     res.status(201).send();
 })
 
+
+
+
+// Endpoint para obtener todas las tareas
+app.get('/tareas', function (req, res) {
+    res.setHeader('Content-Type', 'application/json');
+    
+    // Realizamos el SELECT para obtener todas las tareas
+    db.all('SELECT * FROM todos', [], (err, rows) => {
+        if (err) {
+            console.error("Error al consultar:", err);
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        
+        // Enviamos las tareas en formato JSON
+        res.status(200).json(rows);
+    });
+});
 
 
 app.get('/', function (req, res) {
