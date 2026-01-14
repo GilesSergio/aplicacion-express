@@ -1,4 +1,4 @@
-//Importamos las librarías requeridas
+//Importamos las librerías requeridas
 const express = require('express')
 const bodyParser = require('body-parser')
 const sqlite3 = require('sqlite3').verbose();
@@ -33,7 +33,7 @@ let db = new sqlite3.Database('./base.sqlite3', (err) => {
     });
 });
 
-//Creamos un endpoint de login que recibe los datos como json
+//Creamos un endpoint de insert que recibe los datos como json
 app.post('/insert', jsonParser, function (req, res) {
     //Imprimimos el contenido del campo todo
     const { todo } = req.body;
@@ -104,9 +104,17 @@ app.post('/login', jsonParser, function (req, res) {
     res.end(JSON.stringify({ 'status': 'ok' }));
 })
 
-//Corremos el servidor en el puerto 3000
-const port = 3000;
+// --- INICIO DEL SERVIDOR ---
 
-app.listen(port, () => {
-    console.log(`Aplicación corriendo en http://localhost:${port}`)
-})
+// Solo escuchamos el puerto si este archivo es el principal (no es un test)
+if (require.main === module) {
+    //Usar process.env.PORT para que funcione en Render.com
+    const port = process.env.PORT || 3000;
+    
+    app.listen(port, () => {
+        console.log(`Aplicación corriendo en http://localhost:${port}`)
+    })
+}
+
+// Exportamos app y db para usarlos en los tests
+module.exports = { app: app, db };
